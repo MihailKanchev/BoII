@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviour
     {
         switch (variable)
         {
-            case "isVertical": if (head.GetBool("isVertical").Equals(setter) && body.GetBool("isVertical").Equals(setter)){
+            case "isVertical": if (head.GetBool("isVertical")==setter && body.GetBool("isVertical")==setter){
                                    break;
                                }
                                else{
@@ -108,7 +108,7 @@ public class PlayerController : MonoBehaviour
                                }
                                break;
 
-            case "isRight": if (head.GetBool("isRight").Equals(setter) && body.GetBool("isRight").Equals(setter)){
+            case "isRight": if (head.GetBool("isRight")==setter && body.GetBool("isRight")==setter){
                                 break;
                             }
                             else{
@@ -117,7 +117,7 @@ public class PlayerController : MonoBehaviour
                             }
                             break;
 
-            case "isFace": if (head.GetBool("isFace").Equals(setter)){
+            case "isFace": if (head.GetBool("isFace")==setter){
                                break;
                            }
                            else{
