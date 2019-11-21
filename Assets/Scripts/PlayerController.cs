@@ -5,20 +5,25 @@ namespace Assets.Scripts
     public class PlayerController : MonoBehaviour
     {
         public float playerSpeed; //speed player moves
+        private Vector3 direction;
 
-        // Update is called once per frame
+        // Update is used for inputs.
         void Update()
         {
+            direction = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"),0);
+        }
+
+        //Fixed update is mainly used for physics checks.
+        private void FixedUpdate()
+        {
             Move();
-            //Debug.Log("I'm attached to " + gameObject.name);
         }
 
         //Sets playerSpeed appropriately
         void Move()
         {
-            Vector3 v3 = new Vector3(Input.GetAxisRaw("Horizontal"),Input.GetAxisRaw("Vertical"), 0.0F);
-            //Translate takes in a vector
-            transform.Translate(playerSpeed * v3.normalized * Time.deltaTime);
+            Vector3 newPosition = transform.position + (direction.normalized * playerSpeed * Time.deltaTime);
+            gameObject.GetComponent<Rigidbody>().MovePosition(newPosition);
         }
     }
 }
