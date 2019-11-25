@@ -74,12 +74,14 @@ namespace Assets.Scripts
         //Sets the Speed variable on body Animator.
         void SetAnimatorSpeedVariable()
         {
+            //Setting head animation trigger. Head has to turn earlier than body.
             if(player.velocity.magnitude < 1.9)
             {
                 head.SetBool("SideHead", false);
                 head.SetBool("FrontHead", true);
                 head.SetBool("BackHead", false);
             }
+            //Setting up the body nimation trigger
             if (player.velocity.magnitude > 0.2)
             {
                 body.SetFloat("Speed", 2);

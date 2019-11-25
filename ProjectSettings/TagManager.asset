@@ -41,3 +41,6 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Doorways
+    uniqueID: 3466587109
+    locked: 0
