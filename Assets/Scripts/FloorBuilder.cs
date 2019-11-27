@@ -7,164 +7,221 @@ public class FloorBuilder : MonoBehaviour
 {
     public int maxRooms;
 
-    private System.Random rnd;
-    private bool rightDoor, leftDoor, frontDoor, bottomDoor;
-    private Floor mesh;
+    private int currentRooms;
+    private Queue<Room> toVisit;
+    private List<Room> rooms;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        rnd = new System.Random();
-        mesh = new Floor(maxRooms);
-        SetAdjacentRoomDoors();
-        DrawDoors();
-    }
-    //Sets the doors for adjacent rooms
-    private void SetAdjacentRoomDoors()
-    {
-        Vector2 position;
-        position = new Vector2(mesh.GetRoom(0).x + 1, mesh.GetRoom(0).y);
-        if (mesh.IsRoom(position))
-        {
-            rightDoor = true;
-        }
-        else
-        {
-            rightDoor = false;
-        }
-        position = new Vector2(mesh.GetRoom(0).x - 1, mesh.GetRoom(0).y);
-        if (mesh.IsRoom(position))
-        {
-            leftDoor = true;
-        }
-        else
-        {
-            leftDoor = false;
-        }
-        position = new Vector2(mesh.GetRoom(0).x, mesh.GetRoom(0).y + 1);
-        if (mesh.IsRoom(position))
-        {
-            frontDoor = true;
-        }
-        else
-        {
-            frontDoor = false;
-        }
-        position = new Vector2(mesh.GetRoom(0).x, mesh.GetRoom(0).y - 1);
-        if (mesh.IsRoom(position))
-        {
-            bottomDoor = true;
-        }
-        else
-        {
-            bottomDoor = false;
-        }
-    }
-    //Randomly asssigns(or does not assign) a door to a position towards which there is no room.
-    private void GenerateRandomRooms()
-    {
-        if (!rightDoor)
-        {
-            if (rnd.Next(0, 3) == 0 && mesh.Size() <= mesh.maxRooms)
-            {
-                rightDoor = true;
-            }
-        }
-        if (!leftDoor)
-        {
-            if (rnd.Next(0, 3) == 0 && mesh.Size() <= mesh.maxRooms)
-            {
-                leftDoor = true;
-            }
-        }
-        if (!frontDoor)
-        {
-            if (rnd.Next(0, 3) == 0 && mesh.Size() <= mesh.maxRooms)
-            {
-                frontDoor = true;
-            }
-        }
-        if (!bottomDoor)
-        {
-            if (rnd.Next(0, 3) == 0 && mesh.Size() <= mesh.maxRooms)
-            {
-                bottomDoor = true;
-            }
-        }
-        if(!rightDoor && !leftDoor && !frontDoor && !bottomDoor)
-        {
-            GenerateRandomRooms();
-        }
-    }
-    //Sets active door gameobjects if their boolean is true
-    private void DrawDoors()
-    {
-        GenerateRandomRooms();
-        if (rightDoor)
-        {
-            gameObject.transform.Find("RightDoor").gameObject.SetActive(true);
-        }
-        if (leftDoor)
-        {
-            gameObject.transform.Find("LeftDoor").gameObject.SetActive(true);
-        }
-        if (frontDoor)
-        {
-            gameObject.transform.Find("FrontDoor").gameObject.SetActive(true);
-        }
-        if (bottomDoor)
-        {
-            gameObject.transform.Find("BottomDoor").gameObject.SetActive(true);
-        }
-    }
-}
-public class Floor
-{
-    public int tail, maxRooms;
-    private Vector2[] generatedRooms;
+        rooms = new List<Room>();
+        toVisit = new Queue<Room>();
 
-    //Sets up the head to the center of the mesh.
-    public Floor(int _maxRooms)
-    {
-        maxRooms = _maxRooms;
-        generatedRooms = new Vector2[maxRooms];
-        generatedRooms[0] = new Vector2(50, 50);
-        tail = 0;
+        Room room = new Room(new Vector2(0, 0));
+        GenerateDoors(room);
+        
+        
     }
-    //Checks if the Vector2 position that is given is a room.
-    public bool IsRoom(Vector2 position)
+
+    //Generates all doors of the room (even the door from the direction it came from).
+    //Then it pushes it to toVisit stack if there are more doors that are not visited.
+    //Otherwise adds the room into the rooms List.
+    public void GenerateDoors(Room room)
     {
-        for (int i = 0; i < generatedRooms.Length; i++)
+        int allowedDoors = 4 - room.pathTail;
+        //Lowers number of generated doors if it exceeds the maxRoom limit.
+        if(allowedDoors > (maxRooms - currentRooms))
         {
-            if (position.Equals(generatedRooms[i]))
+            allowedDoors = maxRooms - currentRooms;
+        }
+        int doors = UnityEngine.Random.Range(1, allowedDoors);
+
+        //Randomly generates a door in a direction where there is no door.
+        while (doors > 0)
+        {
+            int direction = UnityEngine.Random.Range(0, 4);
+            if(!IsInArray(room.path, direction))
+            {
+                room.path[room.pathTail] = direction;
+                room.pathTail++;
+                currentRooms++;
+                doors--;
+            }
+        }
+
+        //Adds it to rooms List if no paths are to visit. Pushes it to stack if more paths are to be visited.
+        if(room.pathTail == room.isVisitedTail)
+        {
+            rooms.Add(room);
+        }
+        //If all paths of the room are visited, adds it to the rooms List.
+        else
+        {
+            toVisit.Enqueue(room);
+            GenerateRooms();
+        }
+    }
+    //Generates all rooms in the toVisit stack
+    public void GenerateRooms()
+    {   if(toVisit.Count > 0)
+        {
+            Debug.Log(toVisit.Count);
+
+            Room room = toVisit.Dequeue();
+            int pathToVisit = UnityEngine.Random.Range(0, 4);
+            while (IsInArray(room.GetAvailablePaths(), pathToVisit))
+            {
+                pathToVisit = UnityEngine.Random.Range(0, 4);
+            }
+
+            room.isVisited[room.isVisitedTail] = pathToVisit;
+            room.isVisitedTail++;
+
+            if (room.pathTail > room.isVisitedTail)
+            {
+                toVisit.Enqueue(room);
+            }
+
+            Room newRoom = new Room(new Vector2(0, 0));
+
+            if (pathToVisit == 0)
+            {
+                newRoom = new Room(new Vector2(room.GetX(), room.GetY() + 1));
+                newRoom.path[newRoom.pathTail] = 2;
+                newRoom.isVisited[newRoom.isVisitedTail] = 2;
+            }
+            if (pathToVisit == 1)
+            {
+                newRoom = new Room(new Vector2(room.GetX() + 1, room.GetY()));
+                newRoom.path[newRoom.pathTail] = 3;
+                newRoom.isVisited[newRoom.isVisitedTail] = 3;
+            }
+            if (pathToVisit == 2)
+            {
+                newRoom = new Room(new Vector2(room.GetX(), room.GetY() - 1));
+                newRoom.path[newRoom.pathTail] = 0;
+                newRoom.isVisited[newRoom.isVisitedTail] = 0;
+            }
+            if (pathToVisit == 3)
+            {
+                newRoom = new Room(new Vector2(room.GetX() - 1, room.GetY()));
+                newRoom.path[newRoom.pathTail] = 1;
+                newRoom.isVisited[newRoom.isVisitedTail] = 1;
+            }
+
+            newRoom.pathTail++;
+            newRoom.isVisitedTail++;
+
+            GenerateDoors(newRoom);
+        }
+        else
+        {
+            GenerateFloorObjects();
+        }
+    }
+    //Checks if the number exists inside the array
+    public bool IsInArray(int[] array, int number)
+    {
+        for(int i = 0; i < array.Length; i++)
+        {
+            if(array[i] == number)
             {
                 return true;
             }
         }
         return false;
     }
-    //Checks if that position is of a room, if not, adds a room to that position
-    public bool AddRoom(Vector2 position)
+    //Generates all room objects of the floor.
+    public void GenerateFloorObjects()
     {
-        if (!IsRoom(position))
+        for (int i = 0; i < rooms.Count; i++)
         {
-            tail++;
-            generatedRooms[tail] = position;
-            return true;
-        }
-        else
-        {
-            return false;
+            GameObject room = Instantiate(gameObject.transform.Find("Room").gameObject, 
+                                          new Vector3(rooms[i].GetX() * 12, rooms[i].GetY() * 7, 0), 
+                                          Quaternion.identity);
+            room.SetActive(true);
+            for (int n = 0; n < rooms[i].path.Length; n++)
+            {
+                if(rooms[i].path[n] == 0)
+                {
+                    room.transform.Find("FrontDoor").gameObject.SetActive(true);
+                }
+                if (rooms[i].path[n] == 1)
+                {
+                    room.transform.Find("RightDoor").gameObject.SetActive(true);
+                }
+                if (rooms[i].path[n] == 2)
+                {
+                    room.transform.Find("BottomDoor").gameObject.SetActive(true);
+                }
+                if (rooms[i].path[n] == 3)
+                {
+                    room.transform.Find("LeftDoor").gameObject.SetActive(true);
+                }
+            }
         }
     }
 
-    public int Size()
+    public class Room
     {
-        return generatedRooms.Length;
-    }
+        public Vector2 position;
+        public int[] path;
+        public int[] isVisited;
+        public int pathTail, isVisitedTail;
 
-    public Vector2 GetRoom(int index)
-    {
-        return generatedRooms[index];
+
+        public Room(Vector2 _position)
+        {
+            isVisited = new int[4];
+            path = new int[4];
+            position = _position;
+            pathTail = 0;
+            isVisitedTail = 0;
+        }
+
+        public float GetX()
+        {
+            return position.x;
+        }
+        public float GetY()
+        {
+            return position.y;
+        }
+
+        //Returns an array of a Room with all paths that are not visited.
+        public int[] GetAvailablePaths()
+        {
+            int[] availablePaths;
+            if (pathTail != isVisitedTail && pathTail != 0 && isVisitedTail != 0)
+            {
+                availablePaths = new int[pathTail - isVisitedTail];
+                int tail = 0;
+                for (int i = 0; i < pathTail-1; i++)
+                {
+                    bool equals = true;
+                    for (int n = 0; n < isVisitedTail-1; n++)
+                    {
+                        if (isVisited[n] != path[i])
+                        {
+                            equals = false;
+                            break;
+                        }
+                    }
+                    if (!equals)
+                    {
+                        availablePaths[tail] = path[i];
+                        tail++;
+                    }
+                    equals = true;
+                }
+            }
+            else
+            {
+                availablePaths = new int[0];
+            }
+
+            return availablePaths;
+        }
     }
 }
+
