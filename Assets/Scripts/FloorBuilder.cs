@@ -12,15 +12,13 @@ public class FloorBuilder : MonoBehaviour
     private List<Room> rooms;
 
     // Start is called before the first frame update
-    void Awake()
+    void Start()
     {
         rooms = new List<Room>();
         toVisit = new Queue<Room>();
 
         Room room = new Room(new Vector2(0, 0));
         GenerateDoors(room);
-        
-        
     }
 
     //Generates all doors of the room (even the door from the direction it came from).
@@ -28,37 +26,52 @@ public class FloorBuilder : MonoBehaviour
     //Otherwise adds the room into the rooms List.
     public void GenerateDoors(Room room)
     {
-        int allowedDoors = 4 - room.pathTail;
-        //Lowers number of generated doors if it exceeds the maxRoom limit.
-        if(allowedDoors > (maxRooms - currentRooms))
+        if(currentRooms < maxRooms)
         {
-            allowedDoors = maxRooms - currentRooms;
-        }
-        int doors = UnityEngine.Random.Range(1, allowedDoors);
+            int allowedDoors = 4 - room.pathTail;
+            //Lowers number of generated doors if it exceeds the maxRoom limit.
+            if (allowedDoors > (maxRooms - currentRooms))
+                allowedDoors = maxRooms - currentRooms;
 
-        //Randomly generates a door in a direction where there is no door.
-        while (doors > 0)
-        {
-            int direction = UnityEngine.Random.Range(0, 4);
-            if(!IsInArray(room.path, direction))
+            int doors;
+            if (allowedDoors > 1)
             {
-                room.path[room.pathTail] = direction;
-                room.pathTail++;
-                currentRooms++;
-                doors--;
+                doors = UnityEngine.Random.Range(1, allowedDoors);
+
+                
+            }
+            else
+            {
+                doors = 1;
+            }
+            //Randomly generates a door in a direction where there is no door.
+            while (doors > 0)
+            {
+                int direction = UnityEngine.Random.Range(0, 4);
+                if (!IsInArray(room.path, direction))
+                {
+                    room.path[room.pathTail] = direction;
+                    room.pathTail++;
+                    currentRooms++;
+                    doors--;
+                }
+            }
+
+            //If all paths of the room are visited, add it to the rooms List.
+            if (room.pathTail == room.isVisitedTail)
+            {
+                rooms.Add(room);
+            }
+            //Adds it to rooms List if no paths are to visit. Pushes it to stack if more paths are to be visited.
+            else
+            {
+                toVisit.Enqueue(room);
+                GenerateRooms();
             }
         }
-
-        //Adds it to rooms List if no paths are to visit. Pushes it to stack if more paths are to be visited.
-        if(room.pathTail == room.isVisitedTail)
-        {
-            rooms.Add(room);
-        }
-        //If all paths of the room are visited, adds it to the rooms List.
         else
         {
-            toVisit.Enqueue(room);
-            GenerateRooms();
+            rooms.Add(room);
         }
     }
     //Generates all rooms in the toVisit stack
@@ -68,11 +81,61 @@ public class FloorBuilder : MonoBehaviour
             Debug.Log(toVisit.Count);
 
             Room room = toVisit.Dequeue();
-            int pathToVisit = UnityEngine.Random.Range(0, 4);
-            while (IsInArray(room.GetAvailablePaths(), pathToVisit))
+            int pathToVisit;
+            bool legalValue = false;
+            do
             {
                 pathToVisit = UnityEngine.Random.Range(0, 4);
+                if (IsInArray(room.GetAvailablePaths(), pathToVisit))
+                {
+                    if (pathToVisit == 0)
+                    {
+                        if (!Exists(new Vector2(room.GetX(), room.GetY() + 1)))
+                        {
+                            legalValue = true;
+                        }
+                        else
+                        {
+                            legalValue = false;
+                        }
+                    }
+                    if (pathToVisit == 1)
+                    {
+                        if (!Exists(new Vector2(room.GetX() + 1, room.GetY())))
+                        {
+                            legalValue = true;
+                        }
+                        else
+                        {
+                            legalValue = false;
+                        }
+                    }
+                    if (pathToVisit == 2)
+                    {
+                        if (!Exists(new Vector2(room.GetX(), room.GetY() - 1)))
+                        {
+                            legalValue = true;
+                        }
+                        else
+                        {
+                            legalValue = false;
+                        }
+                    }
+                    if (pathToVisit == 3)
+                    {
+                        if (!Exists(new Vector2(room.GetX() - 1, room.GetY())))
+                        {
+                            legalValue = true;
+                        }
+                        else
+                        {
+                            legalValue = false;
+                        }
+                    }
+                }
             }
+            while (!legalValue);
+
 
             room.isVisited[room.isVisitedTail] = pathToVisit;
             room.isVisitedTail++;
@@ -82,7 +145,7 @@ public class FloorBuilder : MonoBehaviour
                 toVisit.Enqueue(room);
             }
 
-            Room newRoom = new Room(new Vector2(0, 0));
+            Room newRoom;
 
             if (pathToVisit == 0)
             {
@@ -102,7 +165,7 @@ public class FloorBuilder : MonoBehaviour
                 newRoom.path[newRoom.pathTail] = 0;
                 newRoom.isVisited[newRoom.isVisitedTail] = 0;
             }
-            if (pathToVisit == 3)
+            else
             {
                 newRoom = new Room(new Vector2(room.GetX() - 1, room.GetY()));
                 newRoom.path[newRoom.pathTail] = 1;
@@ -116,17 +179,21 @@ public class FloorBuilder : MonoBehaviour
         }
         else
         {
+            Debug.Log("Generating game objects");
             GenerateFloorObjects();
         }
     }
     //Checks if the number exists inside the array
     public bool IsInArray(int[] array, int number)
     {
-        for(int i = 0; i < array.Length; i++)
+        if(array.Length > 0)
         {
-            if(array[i] == number)
+            for (int i = 0; i < array.Length; i++)
             {
-                return true;
+                if (array[i] == number)
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -140,7 +207,7 @@ public class FloorBuilder : MonoBehaviour
                                           new Vector3(rooms[i].GetX() * 12, rooms[i].GetY() * 7, 0), 
                                           Quaternion.identity);
             room.SetActive(true);
-            for (int n = 0; n < rooms[i].path.Length; n++)
+            for (int n = 0; n < rooms[i].pathTail-1; n++)
             {
                 if(rooms[i].path[n] == 0)
                 {
@@ -160,6 +227,18 @@ public class FloorBuilder : MonoBehaviour
                 }
             }
         }
+    }
+    //Checks if the location has a room already existing there
+    public bool Exists(Vector2 position)
+    {
+        for(int i = 0; i < rooms.Count; i++)
+        {
+            if(position.Equals(rooms[i].position))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public class Room
@@ -192,14 +271,14 @@ public class FloorBuilder : MonoBehaviour
         public int[] GetAvailablePaths()
         {
             int[] availablePaths;
-            if (pathTail != isVisitedTail && pathTail != 0 && isVisitedTail != 0)
+            if (pathTail != isVisitedTail && pathTail > 1)
             {
-                availablePaths = new int[pathTail - isVisitedTail];
+                availablePaths = new int[4];
                 int tail = 0;
-                for (int i = 0; i < pathTail-1; i++)
+                bool equals = true;
+                for (int i = 0; i < pathTail; i++)
                 {
-                    bool equals = true;
-                    for (int n = 0; n < isVisitedTail-1; n++)
+                    for (int n = 0; n < isVisitedTail; n++)
                     {
                         if (isVisited[n] != path[i])
                         {
@@ -211,9 +290,15 @@ public class FloorBuilder : MonoBehaviour
                     {
                         availablePaths[tail] = path[i];
                         tail++;
+                        equals = true;
                     }
-                    equals = true;
                 }
+                int[] returnArray = new int[tail];
+                for(int i = 0; i < tail; i++)
+                {
+                    returnArray[i] = availablePaths[i];
+                }
+                availablePaths = returnArray;
             }
             else
             {
