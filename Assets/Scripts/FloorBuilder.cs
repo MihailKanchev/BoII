@@ -43,7 +43,7 @@ public class FloorBuilder : MonoBehaviour
         {
             doors = rnd.Next(0, 2);
         }
-        
+        //GOES BOOM HERE
         //Randomly generates a door in a direction where there is no door.
         while (doors != 0)
         {
@@ -107,29 +107,28 @@ public class FloorBuilder : MonoBehaviour
 
         Room newRoom;
 
-        if (pathToVisit == 0)
+        switch (pathToVisit)
         {
-            newRoom = new Room(new Vector2(room.GetX(), room.GetY() + 1));
-            newRoom.path[newRoom.pathTail-1] = 2;
-            newRoom.isVisited[newRoom.isVisitedTail-1] = 2;
-        }
-        if (pathToVisit == 1)
-        {
-            newRoom = new Room(new Vector2(room.GetX() + 1, room.GetY()));
-            newRoom.path[newRoom.pathTail-1] = 3;
-            newRoom.isVisited[newRoom.isVisitedTail-1] = 3;
-        }
-        if (pathToVisit == 2)
-        {
-            newRoom = new Room(new Vector2(room.GetX(), room.GetY() - 1));
-            newRoom.path[newRoom.pathTail-1] = 0;
-            newRoom.isVisited[newRoom.isVisitedTail-1] = 0;
-        }
-        else
-        {
-            newRoom = new Room(new Vector2(room.GetX() - 1, room.GetY()));
-            newRoom.path[newRoom.pathTail - 1] = 1;
-            newRoom.isVisited[newRoom.isVisitedTail - 1] = 1;
+            case 0:
+                newRoom = new Room(new Vector2(room.GetX(), room.GetY() + 1));
+                newRoom.path[newRoom.pathTail - 1] = 2;
+                newRoom.isVisited[newRoom.isVisitedTail - 1] = 2;
+                break;
+            case 1:
+                newRoom = new Room(new Vector2(room.GetX() + 1, room.GetY()));
+                newRoom.path[newRoom.pathTail - 1] = 3;
+                newRoom.isVisited[newRoom.isVisitedTail - 1] = 3;
+                break;
+            case 2:
+                newRoom = new Room(new Vector2(room.GetX(), room.GetY() - 1));
+                newRoom.path[newRoom.pathTail - 1] = 0;
+                newRoom.isVisited[newRoom.isVisitedTail - 1] = 0;
+                break;
+            case 3:
+                newRoom = new Room(new Vector2(room.GetX() - 1, room.GetY()));
+                newRoom.path[newRoom.pathTail - 1] = 1;
+                newRoom.isVisited[newRoom.isVisitedTail - 1] = 1;
+                break;
         }
 
         newRoom.pathTail++;
@@ -164,21 +163,20 @@ public class FloorBuilder : MonoBehaviour
             room.SetActive(true);
             for (int n = 0; n < rooms[i].pathTail-1; n++)
             {
-                if (rooms[i].path[n] == 0)
+                switch (rooms[i].path[n])
                 {
-                    room.transform.Find("FrontDoor").gameObject.SetActive(true);
-                }
-                if (rooms[i].path[n] == 1)
-                {
-                    room.transform.Find("RightDoor").gameObject.SetActive(true);
-                }
-                if (rooms[i].path[n] == 2)
-                {
-                    room.transform.Find("BottomDoor").gameObject.SetActive(true);
-                }
-                if (rooms[i].path[n] == 3)
-                {
-                    room.transform.Find("LeftDoor").gameObject.SetActive(true);
+                    case 0:
+                        room.transform.Find("FrontDoor").gameObject.SetActive(true);
+                        break;
+                    case 1:
+                        room.transform.Find("RightDoor").gameObject.SetActive(true);
+                        break;
+                    case 2:
+                        room.transform.Find("BottomDoor").gameObject.SetActive(true);
+                        break;
+                    case 3:
+                        room.transform.Find("LeftDoor").gameObject.SetActive(true);
+                        break;
                 }
             }
         }
@@ -186,21 +184,20 @@ public class FloorBuilder : MonoBehaviour
     //Checks if the location has a room already existing there
     public bool IsRoom(Vector2 position, int number)
     {
-        if (number == 0)
+        switch (number)
         {
-            position.y++;
-        }
-        if (number == 1)
-        {
-            position.x++;
-        }
-        if (number == 2)
-        {
-            position.y--;
-        }
-        if (number == 3)
-        {
-            position.x--;
+            case 0:
+                position.y++;
+                break;
+            case 1:
+                position.x++;
+                break;
+            case 2:
+                position.y--;
+                break;
+            case 3:
+                position.x--;
+                break;
         }
         for (int i = 0; i < rooms.Count-1; i++)
         {
@@ -238,6 +235,7 @@ public class FloorBuilder : MonoBehaviour
             return position.y;
         }
 
+        //THIS IS INCONSISTANT MAYBE?
         //Returns an array of a Room with all paths that are not visited.
         public int[] GetAvailablePaths()
         {
