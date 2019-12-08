@@ -52,7 +52,7 @@ public class FloorBuilder : MonoBehaviour
             bool test1 = IsInArray(test, direction);
             if (test1)
             {
-                room.path[room.pathTail-1] = direction;
+                room.path[room.pathTail] = direction;
                 room.pathTail++;
                 currentRooms++;
                 doors--;
@@ -109,7 +109,7 @@ public class FloorBuilder : MonoBehaviour
 
         switch (pathToVisit)
         {
-            case 0:
+            default:
                 newRoom = new Room(new Vector2(room.GetX(), room.GetY() + 1));
                 newRoom.path[newRoom.pathTail - 1] = 2;
                 newRoom.isVisited[newRoom.isVisitedTail - 1] = 2;
@@ -141,7 +141,7 @@ public class FloorBuilder : MonoBehaviour
     {
         if (array.Length > 0)
         {
-            for (int i = 0; i < array.Length-1; i++)
+            for (int i = 0; i < array.Length; i++)
             {
                 if (array[i] == number)
                 {
@@ -262,7 +262,7 @@ public class FloorBuilder : MonoBehaviour
                     }
                     equals = false;
                 }
-                int[] returnArray = new int[tail - 1];
+                int[] returnArray = new int[tail];
                 for (int i = 0; i < returnArray.Length - 1; i++)
                 {
                     returnArray[i] = availablePaths[i];
