@@ -18,6 +18,8 @@ public class FloorBuilder : MonoBehaviour
         int centerX = xAxis / 2;
         int centerY = yAxis / 2;
         grid[centerX, centerY] = 1;
+        currentRooms++;
+        gameObject.transform.Find("Isaac").position = new Vector3(centerX*12, centerY*7, 0);
     }
     void FixedUpdate()
     {
@@ -27,33 +29,21 @@ public class FloorBuilder : MonoBehaviour
             int x = rnd.Next(0, xAxis);
             int y = rnd.Next(0, yAxis);
             int neighbors = 0;
-            if (x + 1 <= grid.GetLength(0) - 1)
+            if (x + 1 < xAxis && grid[x + 1, y] > 0)
             {
-                if (grid[x + 1, y] > 0)
-                {
-                    neighbors++;
-                }
+                neighbors++;
             }
-            if (x - 1 >= 0)
+            if (x - 1 >= 0 && grid[x - 1, y] > 0)
             {
-                if (grid[x - 1, y] > 0)
-                {
-                    neighbors++;
-                }
+                neighbors++;
             }
-            if (y + 1 <= grid.GetLength(1) - 1)
+            if (y + 1 < yAxis && grid[x, y + 1] > 0)
             {
-                if (grid[x, y + 1] > 0)
-                {
-                    neighbors++;
-                }
+                neighbors++;
             }
-            if (y - 1 >= 0)
+            if (y - 1 >= 0 && grid[x, y - 1] > 0)
             {
-                if (grid[x, y - 1] > 0)
-                {
-                    neighbors++;
-                }
+                neighbors++;
             }
             if (neighbors <= 1 && neighbors > 0 && grid[x,y] == 0)
             {
@@ -81,21 +71,25 @@ public class FloorBuilder : MonoBehaviour
                                       new Vector3(i * 12, n * 7, 0),
                                       Quaternion.identity);
                     room.SetActive(true);
+                    if (i + 1 < xAxis && grid[i + 1, n] > 0)
+                    {
+                        room.transform.Find("RightDoor").gameObject.SetActive(true);
+                    }
+                    if (i - 1 >= 0 && grid[i - 1, n] > 0)
+                    {
+                        room.transform.Find("LeftDoor").gameObject.SetActive(true);
+                    }
+                    if (n + 1 < yAxis && grid[i, n + 1] > 0)
+                    {
+                        room.transform.Find("FrontDoor").gameObject.SetActive(true);
+                    }
+                    if (n - 1 >= 0 && grid[i, n - 1] > 0)
+                    {
+                        room.transform.Find("BottomDoor").gameObject.SetActive(true);
+                    }
                 }
             }
         }
-        //            case 0:
-        //                room.transform.Find("FrontDoor").gameObject.SetActive(true);
-        //                break;
-        //            case 1:
-        //                room.transform.Find("RightDoor").gameObject.SetActive(true);
-        //                break;
-        //            case 2:
-        //                room.transform.Find("BottomDoor").gameObject.SetActive(true);
-        //                break;
-        //            case 3:
-        //                room.transform.Find("LeftDoor").gameObject.SetActive(true);
-        //                break;
     }
 }
 
