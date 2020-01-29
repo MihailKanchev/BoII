@@ -1,4 +1,4 @@
-#A very simple, bare-bones PG algorithm for the Binding of Isaac level generation.
+# A very simple, bare-bones PG algorithm for the Binding of Isaac level generation.
 
 The Binding of Isaac has procedural generation in quite a few layers of the game. From the very structure of a floor with its many levels to the props and enemies, generated live, in-game.
 With the current integration I try to recreate the structure of the game's rooms.
