@@ -7,7 +7,7 @@ I am yet to define the type of algorithm (it took great inspiration from Prim's 
 The entire integration is built in Unity, making use of C# and Unity libraries.
 The algorithm executes every frame, but with a single concern- it can never be fully random just because of how System.Random operates and the number of operations that have to be executed.
 
-1. The algorithm takes in a 2d array and fills it up with 0s.
+1. The algorithm takes in a 2D array and fills it up with 0s.
 
 2. estimates te center of the mesh by deviding both of its axes.
 
