@@ -20,3 +20,8 @@ You can influence the structure of the level by dictating a limit of how many ne
 I have left a value maxRooms which serves as a limit to how many rooms the algorithm should generate.
 
 I have also given the ability to switch the mesh size, making it the size you would like it to be.
+
+
+![Example 1](https://i.imgur.com/5cknFYD.png "Example 1")
+![Example 2](https://i.imgur.com/w9ZdBxp.png "Example 2")
+![Example 3](https://i.imgur.com/jfBlKJi.png "Example 3")
