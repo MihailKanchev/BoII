@@ -17,9 +17,9 @@ The algorithm executes every frame, but with a single concern- it can never be f
 
 You can influence the structure of the level by dictating a limit of how many neighbors a room should have.
 
-I have left a value maxRooms which serves as a limit to how many rooms the algorithm should generate.
+There is a maxRooms value setting the maximum amount of rooms to be created.
 
-I have also given the ability to switch the mesh size, making it the size you would like it to be.
+I have also given the ability to set the mesh size.
 
 
 ![Example](https://i.imgur.com/qu1SGXJ.png "Example")
