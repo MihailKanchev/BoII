@@ -2,7 +2,7 @@
 
 The Binding of Isaac has procedural generation in quite a few layers of the game. From the very structure of a floor with its many levels to the props and enemies, generated live, in-game.
 With the current integration I try to recreate the structure of the game's rooms.
-I am yet to define the type of algorithm (it took great inspiration from Prim's algorithm), but it works in a couple of very simple steps.
+I am yet to define the type of algorithm (Randomized Prim's algorithm perhaps?), but it works in a couple of very simple steps.
 
 The entire integration is built in Unity, making use of C# and Unity libraries.
 The algorithm executes every frame, but with a single concern- it can never be fully random just because of how System.Random operates and the number of operations that have to be executed.
