@@ -7,13 +7,13 @@ I am yet to define the type of algorithm (Randomized Prim's algorithm perhaps?),
 The entire integration is built in Unity, making use of C# and Unity libraries.
 The algorithm executes every frame, but with a single concern- it can never be fully random just because of how System.Random operates and the number of operations that have to be executed.
 
-1. The algorithm takes in a 2D array and fills it up with 0s.
+1. The algorithm takes in a 2D array and fills it up with "0".
 
-2. estimates te center of the mesh by deviding both of its axes.
+2.Then it estimates the center of the mesh(array) by deviding both of its axes.
 
-3. After the center of the array is found, a 1 is written there to indicate the position of the starting room.
+3. After the center of the mesh(array) is found, a "1" is written there to indicate the position of the starting room.
 
-4. The algorithm then generates a random x and y values, checks if the room coresponding to these values has any neighbors and if it does, the algorithm writes a 2 in its spot, indicating the existance of a room there.
+4. The algorithm then generates a random x and y values, checks if the room coresponding to these values has any neighbors and if it does, the algorithm writes a "2" in its spot, indicating the existance of a room there.
 
 You can influence the structure of the level by dictating a limit of how many neighbors a room should have.
 
